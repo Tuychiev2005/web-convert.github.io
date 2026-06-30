@@ -307,6 +307,25 @@ function goToFinal(){
   show('s5');setDot(4);
   startCountdown(new Date(y,m-1,d,...chosenTime.split(':').map(Number)));
   buildQR(d,m,y);
+  sendTelegramNotification(d,m,y,msg);
+}
+
+function sendTelegramNotification(d,m,y,msg){
+  const params=new URLSearchParams({d,m,y,t:chosenTime,food:chosenFood.join(','),from:'Валижон'});
+  const base=window.location.href.split('?')[0];
+  const url=base+'?'+params.toString();
+  const foodStr=chosenFood.join(' · ')||'не выбрано';
+  const dateStr=d+' '+MONTHS_GEN[m-1]+' '+y;
+  let text='💌 *Элина согласилась на свидание!*\n\n';
+  text+='📅 '+dateStr+' в '+chosenTime+'\n';
+  text+='🍽️ '+foodStr+'\n';
+  if(msg)text+='💬 «'+msg+'»\n';
+  text+='\n🔗 '+url;
+  fetch('https://api.telegram.org/bot8312057106:AAFRfniqcLDDeLbetIcI5tDmuNlxldN2dJ0/sendMessage',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({chat_id:'633426032',text:text,parse_mode:'Markdown'})
+  }).catch(()=>{});
 }
 
 function startCountdown(target){
